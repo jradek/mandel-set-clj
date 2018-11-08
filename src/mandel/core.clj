@@ -4,16 +4,21 @@
 
 (defn ppm-header
   "Write the Header for a PPM File"
-  [x-dim y-dim]
-  (clojure.string/join ["P6\n" x-dim " " y-dim " 255\n"]))
+  [w h]
+  (clojure.string/join ["P6\n" w " " h " 255\n"]))
 
-(defn clamp-255
-  [x]
-  (max (min x 255) 0))
+
+(defn clamp
+  "Constrain x to range [min-value ... max-value]"
+  [x & {:keys [min-value max-value]}]
+  (let [min-value (or min-value 0)
+        max-value (or max-value 100)]
+    (max (min x max-value) min-value)))
+
 
 (defn to-byte
   [x]
-  (let [val (clamp-255 x)]
+  (let [val (clamp x :max-value 255)]
     (if (> val 127)
       (byte (- val 256))
       (byte val))))
